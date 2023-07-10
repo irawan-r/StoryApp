@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.amora.storyapp.MainActivity
 import com.amora.storyapp.R
@@ -59,7 +60,12 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
 				}
 			}
 			etPassword.addTextChangedListener(object : TextWatcher {
-				override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+				override fun beforeTextChanged(
+					s: CharSequence?,
+					start: Int,
+					count: Int,
+					after: Int
+				) {
 					// Not needed for this case
 				}
 
@@ -91,7 +97,11 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
 				}
 			}
 			btSignIn.setOnClickListener {
-				findNavController().navigate(R.id.RegisterFragment)
+				val navOptions = NavOptions.Builder()
+					.setEnterAnim(R.anim.slide_from_right)
+					.setExitAnim(R.anim.slide_to_left)
+					.build()
+				findNavController().navigate(R.id.RegisterFragment, null, navOptions)
 			}
 		}
 	}
@@ -116,7 +126,11 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
 
 					is State.Success -> {
 						findNavController().popBackStack()
-						findNavController().navigate(R.id.DashboardFragment)
+						val navOptions = NavOptions.Builder()
+							.setEnterAnim(R.anim.slide_from_right)
+							.setExitAnim(R.anim.slide_to_left)
+							.build()
+						findNavController().navigate(R.id.DashboardFragment, null, navOptions)
 					}
 
 					else -> {
