@@ -1,0 +1,34 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.StoryApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.StoryApp" parent="Base.Theme.StoryApp" />
+
+    <style name="Theme.Button.Default.1" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/purple</item>
+        <item name="elevation">@dimen/size16</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelSmall</item>
+        <item name="android:textColor">@color/light_purple</item>
+        <item name="android:textSize">@dimen/text14</item>
+    </style>
+
+    <style name="Theme.Button.Default.2" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/light_purple</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelSmall</item>
+        <item name="elevation">@dimen/size16</item>
+        <item name="android:textColor">@color/purple</item>
+        <item name="android:textSize">@dimen/text14</item>
+    </style>
+</resources>

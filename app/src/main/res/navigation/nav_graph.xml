@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/LoginFragment">
+
+    <fragment
+        android:id="@+id/DashboardFragment"
+        android:name="com.amora.storyapp.ui.dashboard.DashboardFragment"
+        android:label="@string/dashboard_fragment_label"
+        tools:layout="@layout/fragment_dashboard">
+
+        <action
+            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            app:destination="@id/LoginFragment" />
+        <action
+            android:id="@+id/action_DashboardFragment_to_fragmentDetailStory"
+            app:destination="@id/DetailStoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/LoginFragment"
+        android:name="com.amora.storyapp.ui.login.LoginFragment"
+        android:label="@string/login_fragment_label"
+        tools:layout="@layout/fragment_login">
+
+        <actionm
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@id/DashboardFragment" />
+        <action
+            android:id="@+id/action_LoginFragment_to_registerFragment"
+            app:destination="@id/RegisterFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/RegisterFragment"
+        android:name="com.amora.storyapp.ui.register.RegisterFragment"
+        android:label="Registrasi Akun"
+        tools:layout="@layout/fragment_register">
+        <action
+            android:id="@+id/action_RegisterFragment_to_fragmentStory"
+            app:destination="@id/StoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/StoryFragment"
+        android:name="com.amora.storyapp.ui.story.FragmentStory"
+        android:label="Post Story"
+        tools:layout="@layout/fragment_story" />
+    <fragment
+        android:id="@+id/DetailStoryFragment"
+        android:name="com.amora.storyapp.ui.storydetail.FragmentDetailStory"
+        android:label="Detail Cerita"
+        tools:layout="@layout/fragment_detail_story" >
+        <argument
+            android:name="arg"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
+</navigation>
