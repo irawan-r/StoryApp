@@ -32,7 +32,7 @@ class MainViewModel @Inject constructor(
 
 	fun getSession() {
 		viewModelScope.launch {
-			repository.getSession().collect { userSession ->
+			repository.getSession().collectLatest { userSession ->
 				if (userSession != null) {
 					_navGraphDestination.update {
 						R.id.DashboardFragment

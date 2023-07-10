@@ -6,6 +6,7 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -60,7 +61,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
 	private fun initObserver() {
 		lifecycleScope.launch {
-			viewModel.navGraphDestination.collect { destination ->
+			viewModel.navGraphDestination.collectLatest { destination ->
 				if (destination != null) {
 					navController.navigate(destination)
 				}
@@ -71,6 +72,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 	fun getSession() = viewModel.getSession()
 
 	fun getAppBarToolbar() = binding.appBarLayout
+
+	private fun getScrollToolbar() = binding.clToolbar
 
 	override fun onSupportNavigateUp(): Boolean {
 		return navController.navigateUp() || super.onSupportNavigateUp()
@@ -97,11 +100,13 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 		when (destination.id) {
 			R.id.DashboardFragment -> {
 				enableBackPressExit()
+				getScrollToolbar().visibility = View.VISIBLE
 			}
 
 			else -> {
 				menuItem?.isVisible = false
 				enableBackPress()
+				getScrollToolbar().visibility = View.GONE
 			}
 		}
 	}

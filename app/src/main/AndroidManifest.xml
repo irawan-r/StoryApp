@@ -21,6 +21,15 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.StoryApp">
+        </activity>
+
+        <activity
+            android:theme="@style/Theme.Starting"
+            android:configChanges="uiMode"
+            android:name=".ui.splashscreen.SplashScreen"
+            android:screenOrientation="fullSensor"
+            android:windowSoftInputMode="stateHidden"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

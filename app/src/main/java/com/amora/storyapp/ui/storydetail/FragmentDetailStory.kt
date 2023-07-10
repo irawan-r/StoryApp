@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.amora.storyapp.MainActivity
 import com.amora.storyapp.R
 import com.amora.storyapp.data.remote.model.Story
 import com.amora.storyapp.databinding.FragmentDetailStoryBinding
@@ -98,6 +99,7 @@ class FragmentDetailStory: BaseFragment<FragmentDetailStoryBinding, DetailStoryV
 			} else {
 				tvStoryLocation.visibility = gone
 			}
+			tvStoryTimeStamp.text = Utils.calculateTimeDifference(item.createdAt.toString())
 			val requestOptions = RequestOptions()
 				.diskCacheStrategy(DiskCacheStrategy.ALL)
 				.centerCrop()

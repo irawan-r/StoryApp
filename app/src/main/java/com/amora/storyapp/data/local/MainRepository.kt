@@ -12,6 +12,8 @@ import com.amora.storyapp.data.remote.model.StoryResponse
 import com.amora.storyapp.data.remote.model.User
 import com.amora.storyapp.network.ApiService
 import com.amora.storyapp.utils.ApiUtils.toRequestBodyPart
+import com.amora.storyapp.utils.Utils
+import com.amora.storyapp.utils.Utils.compressImageToFile
 import com.google.gson.Gson
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
@@ -20,10 +22,12 @@ import com.skydoves.sandwich.suspendOnError
 import com.skydoves.sandwich.suspendOnSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
@@ -45,7 +49,7 @@ class MainRepository @Inject constructor(
 	fun getSession(): Flow<User?> {
 		return flow {
 			sessionManager.getSession()?.let { emit(it) }
-		}.flowOn(Dispatchers.Default)
+		}.flowOn(Dispatchers.IO)
 	}
 
 	fun login(
@@ -109,16 +113,23 @@ class MainRepository @Inject constructor(
 		val description = request.description.toRequestBodyPart()
 		val photoUri = request.photo
 		val filePhoto = File(photoUri.toString())
+		val compressedFile = File(context.cacheDir, "compressed_${filePhoto.name}")
 		val latitude = request.lat.toRequestBodyPart()
 		val longitude = request.lon.toRequestBodyPart()
-		var requestFile = filePhoto.asRequestBody("image/*".toMediaTypeOrNull())
+		val requestFile: RequestBody?
 		var finalFileName = filePhoto.name
 		if (!filePhoto.exists()) {
 			val inputStream = context.contentResolver.openInputStream(photoUri?.toUri()!!)
-			requestFile = inputStream?.use { input ->
-				input.readBytes().toRequestBody("image/*".toMediaTypeOrNull())
-			}!!
+			if (inputStream != null) {
+				compressImageToFile(inputStream, compressedFile)
+			}
+
+			val compressedByteArray = compressedFile.readBytes()
+			requestFile = compressedByteArray.toRequestBody("image/*".toMediaTypeOrNull())
 			finalFileName = URLDecoder.decode(filePhoto.name, "UTF-8") + ".jpg"
+		} else {
+			compressImageToFile(filePhoto, compressedFile)
+			requestFile = compressedFile.asRequestBody("image/*".toMediaTypeOrNull())
 		}
 		val imgPhoto = MultipartBody.Part.createFormData("photo", finalFileName, requestFile)
 		val postRequest = apiService.postStories(

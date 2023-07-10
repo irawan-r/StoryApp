@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.DialogInterface
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import android.location.Geocoder
@@ -14,11 +15,34 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.io.OutputStream
 import java.util.Calendar
 import java.util.Locale
 
 object Utils {
+
+	fun compressImageToFile(inputStream: InputStream, outputFile: File) {
+		val options = BitmapFactory.Options()
+		options.inSampleSize = 2 // Adjust the sample size as needed
+
+		val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+		val outputStream = FileOutputStream(outputFile)
+		bitmap?.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+		outputStream.flush()
+		outputStream.close()
+	}
+
+	fun compressImageToFile(sourceFile: File, destinationFile: File) {
+		val options = BitmapFactory.Options()
+		options.inSampleSize = 2 // Adjust the sample size as needed
+
+		val bitmap = BitmapFactory.decodeFile(sourceFile.absolutePath, options)
+		val outputStream = FileOutputStream(destinationFile)
+		bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+		outputStream.flush()
+		outputStream.close()
+	}
 
 	private fun generateTimestampForToday(): Long {
 		val calendar = Calendar.getInstance()
