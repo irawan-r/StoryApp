@@ -2,27 +2,31 @@ package com.amora.storyapp.data.local
 
 import android.content.Context
 import androidx.core.net.toUri
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.amora.storyapp.data.persistence.AppDatabase
 import com.amora.storyapp.data.remote.model.LoginRequest
 import com.amora.storyapp.data.remote.model.LoginResponse
 import com.amora.storyapp.data.remote.model.NormalResponse
 import com.amora.storyapp.data.remote.model.RegisterRequest
-import com.amora.storyapp.data.remote.model.StoriesResponse
+import com.amora.storyapp.data.remote.model.StoryItem
+import com.amora.storyapp.data.remote.model.StoryLocResponse
 import com.amora.storyapp.data.remote.model.StoryRequest
 import com.amora.storyapp.data.remote.model.StoryResponse
 import com.amora.storyapp.data.remote.model.User
 import com.amora.storyapp.network.ApiService
+import com.amora.storyapp.network.StoryRemoteMediator
 import com.amora.storyapp.utils.ApiUtils.toRequestBodyPart
-import com.amora.storyapp.utils.Utils
 import com.amora.storyapp.utils.Utils.compressImageToFile
 import com.google.gson.Gson
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onError
 import com.skydoves.sandwich.onException
-import com.skydoves.sandwich.suspendOnError
 import com.skydoves.sandwich.suspendOnSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -36,7 +40,8 @@ import javax.inject.Inject
 
 class MainRepository @Inject constructor(
 	private val sessionManager: SessionManager,
-	private val apiService: ApiService
+	private val apiService: ApiService,
+	private val appDatabase: AppDatabase
 ) {
 	private fun setSession(user: User) {
 		sessionManager.loginSession(user)
@@ -73,6 +78,8 @@ class MainRepository @Inject constructor(
 			if (message != null) {
 				onError(message)
 			}
+		}.onException {
+			onError(this.message.toString())
 		}
 	}.flowOn(Dispatchers.IO)
 
@@ -99,7 +106,9 @@ class MainRepository @Inject constructor(
 			if (message != null) {
 				onError(message)
 			}
-		}
+		}.onException {
+		onError(this.message.toString())
+	}
 	}.flowOn(Dispatchers.IO)
 
 	fun postStory(
@@ -154,40 +163,27 @@ class MainRepository @Inject constructor(
 			if (message != null) {
 				onError(message)
 			}
-		}.onError {
-			onError(message())
 		}.onException {
-			onError(message())
+			onError(this.message.toString())
 		}
 	}.flowOn(Dispatchers.IO)
 
-	fun getStories(
+	@OptIn(ExperimentalPagingApi::class)
+	fun getPagingStories(
 		token: String,
-		page: Int?,
-		size: Int?,
-		location: Double?,
-		onSuccess: (StoriesResponse?) -> Unit,
-		onError: (String) -> Unit
-	) = flow {
+		location: Double
+	): Flow<PagingData<StoryItem>> {
 		val bearerToken = "Bearer $token"
-		val getStories =
-			apiService.getAllStories(token = bearerToken, page = page, size = size, location = location)
-		getStories.suspendOnSuccess {
-			onSuccess(data)
-			emit(data.message)
-		}.onError {
-			val message: String? = try {
-				val errorMessageObj = Gson().fromJson(message(), NormalResponse::class.java)
-				errorMessageObj.message?.replace("\"", "")
-			} catch (e: Exception) {
-				onError(e.message.toString())
-				null
+		return Pager(
+			config = PagingConfig(
+				pageSize = 10
+			),
+			remoteMediator = StoryRemoteMediator(appDatabase, apiService, bearerToken, location),
+			pagingSourceFactory = {
+				appDatabase.storyDao().getStoryList()
 			}
-			if (message != null) {
-				onError(message)
-			}
-		}
-	}.flowOn(Dispatchers.IO)
+		).flow
+	}
 
 	fun getStory(
 		token: String,
@@ -213,6 +209,34 @@ class MainRepository @Inject constructor(
 			if (message != null) {
 				onError(message)
 			}
+		}.onException {
+			onError(this.message.toString())
+		}
+	}.flowOn(Dispatchers.IO)
+
+	fun getFriendLoc(
+		token: String,
+		onSuccess: (StoryLocResponse) -> Unit,
+		onError: (String) -> Unit
+	) = flow {
+		val bearer = "Bearer $token"
+		val getFriendLoc = apiService.getFriendsLocation(bearer)
+		getFriendLoc.suspendOnSuccess {
+			onSuccess(data)
+			emit(data)
+		}.onError {
+			val message: String? = try {
+				val errorMessageObj = Gson().fromJson(message(), NormalResponse::class.java)
+				errorMessageObj.message?.replace("\"", "")
+			} catch (e: Exception) {
+				onError(e.message.toString())
+				null
+			}
+			if (message != null) {
+				onError(message)
+			}
+		}.onException {
+			onError(this.message.toString())
 		}
 	}.flowOn(Dispatchers.IO)
 }

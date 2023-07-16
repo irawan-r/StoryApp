@@ -11,23 +11,18 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.FragmentNavigator
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.NavHostFragment
 import com.amora.storyapp.databinding.ActivityMainBinding
+import com.amora.storyapp.ui.dashboard.DashboardFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -42,6 +37,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 	private val mainCoroutine = CoroutineScope(Dispatchers.Main)
 	private var backPressJob: Job? = null
 	private var menuItem: MenuItem? = null
+	private var dashboardFragment: DashboardFragment? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -95,6 +91,10 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 		}
 	}
 
+	fun setDashboardFragment(fragment: DashboardFragment) {
+		dashboardFragment = fragment
+	}
+
 	override fun onDestinationChanged(
 		controller: NavController,
 		destination: NavDestination,
@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
 		when (destination.id) {
 			R.id.DashboardFragment -> {
-				enableBackPressExit()
+				enableBackPressExit(destination)
 				getScrollToolbar().visibility = View.VISIBLE
 			}
 
@@ -128,11 +128,14 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 		backPressCallback?.remove()
 	}
 
-	private fun enableBackPressExit() {
+	private fun enableBackPressExit(destination: NavDestination) {
 		removeBackPress()
 		backPressCallback = object : OnBackPressedCallback(true) {
 			override fun handleOnBackPressed() {
 				if (backPressCount == 0) {
+					if (destination.id == R.id.DashboardFragment) {
+						dashboardFragment?.scrollToTop()
+					}
 					Toast.makeText(
 						this@MainActivity,
 						"Tekan sekali untuk keluar",

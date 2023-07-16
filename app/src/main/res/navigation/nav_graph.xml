@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_DashboardFragment_to_fragmentDetailStory"
             app:destination="@id/DetailStoryFragment" />
+        <action
+            android:id="@+id/action_DashboardFragment_to_mapFragment"
+            app:destination="@id/MapFragment" />
     </fragment>
     <fragment
         android:id="@+id/LoginFragment"
@@ -49,10 +52,15 @@
         android:id="@+id/DetailStoryFragment"
         android:name="com.amora.storyapp.ui.storydetail.FragmentDetailStory"
         android:label="Detail Cerita"
-        tools:layout="@layout/fragment_detail_story" >
+        tools:layout="@layout/fragment_detail_story">
         <argument
             android:name="arg"
             android:defaultValue=""
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/MapFragment"
+        android:name="com.amora.storyapp.ui.map.MapFragment"
+        android:label="MapFragment"
+        tools:layout="@layout/fragment_map" />
 </navigation>

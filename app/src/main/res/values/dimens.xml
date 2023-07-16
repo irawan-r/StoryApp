@@ -18,4 +18,5 @@
     <dimen name="text16">14sp</dimen>
     <dimen name="text20">20sp</dimen>
     <dimen name="text24">24sp</dimen>
+    <dimen name="map_padding">8dp</dimen>
 </resources>

@@ -46,7 +46,7 @@ object PermissionUtils {
 			.setMessage("Aplikasi butuh GPS untuk mendapatkan lokasi, nyalakan GPS?")
 			.setPositiveButton(
 				"Ya"
-			) { dialog, which ->
+			) { _, _ ->
 				val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
 				context.startActivity(intent)
 			}

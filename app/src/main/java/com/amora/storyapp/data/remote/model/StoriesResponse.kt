@@ -1,5 +1,7 @@
 package com.amora.storyapp.data.remote.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 
 data class StoriesResponse(
@@ -14,6 +16,7 @@ data class StoriesResponse(
 	val message: String? = null
 )
 
+@Entity(tableName = "story")
 data class StoryItem(
 
 	@Json(name="photoUrl")
@@ -31,8 +34,9 @@ data class StoryItem(
 	@Json(name="lon")
 	val lon: Double? = null,
 
+	@PrimaryKey
 	@Json(name="id")
-	val id: String? = null,
+	val id: String,
 
 	@Json(name="lat")
 	val lat: Double? = null

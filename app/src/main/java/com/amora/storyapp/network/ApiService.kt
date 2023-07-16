@@ -3,6 +3,7 @@ package com.amora.storyapp.network
 import com.amora.storyapp.data.remote.model.LoginResponse
 import com.amora.storyapp.data.remote.model.NormalResponse
 import com.amora.storyapp.data.remote.model.StoriesResponse
+import com.amora.storyapp.data.remote.model.StoryLocResponse
 import com.amora.storyapp.data.remote.model.StoryResponse
 import com.skydoves.sandwich.ApiResponse
 import okhttp3.MultipartBody
@@ -63,9 +64,23 @@ interface ApiService {
 		@Query("location") location: Double?
 	): ApiResponse<StoriesResponse>
 
+	@GET("stories")
+	suspend fun getPagingStories(
+		@Header(AUTH) token: String,
+		@Query("page") page: Int?,
+		@Query("size") size: Int?,
+		@Query("location") location: Double?
+	): StoriesResponse
+
 	@GET("stories/{id}")
 	suspend fun getStoriesById(
 		@Header(AUTH) token: String,
 		@Path("id") id: String
 	): ApiResponse<StoryResponse>
+
+	@GET("stories")
+	suspend fun getFriendsLocation(
+		@Header(AUTH) token: String,
+		@Query("location") location: Double = 1.0
+	): ApiResponse<StoryLocResponse>
 }

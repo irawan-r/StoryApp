@@ -1,21 +1,33 @@
 package com.amora.storyapp.ui.dashboard
 
+import android.app.Activity
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
+import androidx.appcompat.widget.Toolbar
+import androidx.compose.ui.input.key.Key.Companion.Copy
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider.NewInstanceFactory.Companion.instance
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.amora.storyapp.MainActivity
 import com.amora.storyapp.R
 import com.amora.storyapp.data.remote.model.StoryItem
@@ -32,21 +44,27 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DashboardFragment : BaseFragment<FragmentDashboardBinding, DashboardViewModel>(), AdapterStory.OnItemClickListener {
+class DashboardFragment : BaseFragment<FragmentDashboardBinding, DashboardViewModel>(),
+	AdapterStory.OnItemClickListener {
 	override val inflateBinding: (LayoutInflater, ViewGroup?, Boolean) -> FragmentDashboardBinding
 		get() = FragmentDashboardBinding::inflate
 	override val viewModel: DashboardViewModel by viewModels()
 	private lateinit var adapterStories: AdapterStory
+	private lateinit var mlayoutManager: LinearLayoutManager
+	private lateinit var scrollToolbar: AppBarLayout
 
 	override fun onResume() {
 		super.onResume()
 		lifecycleScope.launch {
 			viewModel.getStories()
+			scrollToTop()
 		}
 	}
 
+
 	override fun initView() {
 		(requireActivity() as MainActivity).apply {
+			setDashboardFragment(this@DashboardFragment)
 			supportActionBar()
 			supportToolBar(true)
 
@@ -56,18 +74,15 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding, DashboardViewMo
 
 			// Set the updated layout params for the toolbar
 			getAppBarToolbar().layoutParams = layoutParams
+			scrollToolbar = getAppBarToolbar()
 		}
-		binding?.apply {
-			btPost.setOnClickListener {
-				val navOptions = NavOptions.Builder()
-					.setEnterAnim(R.anim.slide_from_right)
-					.setExitAnim(R.anim.slide_to_left)
-					.build()
-				findNavController().navigate(R.id.StoryFragment, null, navOptions)
-			}
-		}
+
 		adapterStories = AdapterStory(requireContext())
 		adapterStories.setOnItemClickListener(this)
+		adapterStories.setPostItemClickListener(this)
+		adapterStories.setMapItemClickListener(this)
+		showStories()
+
 		val menuHost: MenuHost = requireActivity()
 		menuHost.addMenuProvider(object : MenuProvider {
 			override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -99,15 +114,68 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding, DashboardViewMo
 			}
 		}, viewLifecycleOwner, Lifecycle.State.STARTED)
 
+		var isAppBarVisible = true
+		var scrollDistance = 0
+
+		binding?.rvStories?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+			override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+				scrollDistance += dy
+
+				if (dy > 0 && isAppBarVisible) {
+					// Scrolling downwards
+					if (scrollDistance > 2 * scrollToolbar.totalScrollRange) {
+						// Hide the AppBarLayout
+						scrollToolbar.setExpanded(false, true)
+						isAppBarVisible = false
+						scrollDistance = 0
+					}
+				} else if (dy < 0 && !isAppBarVisible) {
+					// Scrolling upwards
+					if (scrollDistance < -2 * scrollToolbar.totalScrollRange) {
+						// Show the AppBarLayout
+						scrollToolbar.setExpanded(true, true)
+						isAppBarVisible = true
+						scrollDistance = 0
+					}
+				}
+			}
+		})
+	}
+
+	fun scrollToTop() {
+		val smoothScroller = object : LinearSmoothScroller(context) {
+			override fun getVerticalSnapPreference(): Int {
+				return SNAP_TO_START
+			}
+		}
+		smoothScroller.targetPosition = 0
+		binding?.rvStories?.layoutManager?.startSmoothScroll(smoothScroller)
 	}
 
 	override fun onItemClick(item: StoryItem) {
-		val action = DashboardFragmentDirections.actionDashboardFragmentToFragmentDetailStory(item.id.toString())
+		val action =
+			DashboardFragmentDirections.actionDashboardFragmentToFragmentDetailStory(item.id)
 		val navOptions = NavOptions.Builder()
 			.setEnterAnim(R.anim.slide_from_right)
 			.setExitAnim(R.anim.slide_to_left)
 			.build()
 		findNavController().navigate(action, navOptions)
+	}
+
+	override fun onPostClick() {
+		val navOptions = NavOptions.Builder()
+			.setEnterAnim(R.anim.slide_from_right)
+			.setExitAnim(R.anim.slide_to_left)
+			.build()
+		findNavController().navigate(R.id.StoryFragment, null, navOptions)
+	}
+
+	override fun onMapClick() {
+		val navOptions = NavOptions.Builder()
+			.setEnterAnim(R.anim.slide_from_right)
+			.setExitAnim(R.anim.slide_to_left)
+			.build()
+		findNavController().navigate(R.id.MapFragment, null, navOptions)
 	}
 
 
@@ -126,19 +194,19 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding, DashboardViewMo
 					}
 
 					is State.Error -> {
-						val messageApi = state.data?.message
+						loadingState(false)
+						val messageApi = state.data.toString()
 						val message = state.message
 						if (message != null) {
 							binding?.root?.showSnackbarNotice(message)
 						} else {
-							binding?.root?.showSnackbarNotice(messageApi.toString())
+							binding?.root?.showSnackbarNotice(messageApi)
 						}
 					}
 
 					is State.Success -> {
 						loadingState(false)
-						adapterStories.differ.submitList(state.data?.listStory)
-						showStories()
+						adapterStories.submitData(lifecycle, state.data ?: PagingData.empty())
 					}
 
 					else -> {
@@ -158,8 +226,11 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding, DashboardViewMo
 
 	private fun showStories() {
 		binding?.apply {
-			rvStories.adapter = adapterStories
+			rvStories.adapter = adapterStories.withLoadStateFooter(
+				footer = LoadingStateAdapter { adapterStories.retry() }
+			)
 			rvStories.layoutManager = LinearLayoutManager(requireContext())
+			mlayoutManager = rvStories.layoutManager as LinearLayoutManager
 		}
 	}
 }
