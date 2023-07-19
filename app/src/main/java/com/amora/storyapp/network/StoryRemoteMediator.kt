@@ -15,7 +15,8 @@ class StoryRemoteMediator @Inject constructor(
 	private val database: AppDatabase,
 	private val apiService: ApiService,
 	private val token: String,
-	private val location: Double
+	private val location: Double,
+	private var page: Int?,
 ): RemoteMediator<Int, StoryItem>() {
 	private companion object {
 		const val INITIAL_PAGE_INDEX = 1
@@ -28,7 +29,7 @@ class StoryRemoteMediator @Inject constructor(
 		loadType: LoadType,
 		state: PagingState<Int, StoryItem>
 	): MediatorResult {
-		val page = when (loadType) {
+		page = when (loadType) {
 			LoadType.REFRESH ->{
 				val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
 				remoteKeys?.nextKey?.minus(1) ?: INITIAL_PAGE_INDEX
@@ -55,8 +56,8 @@ class StoryRemoteMediator @Inject constructor(
 					database.storyDao().deleteStoryList()
 					database.remoteKeysDao().deleteRemoteKeys()
 				}
-				val prevKey = if (page == 1) null else page - 1
-				val nextKey = if (endOfPaginationReached) null else page + 1
+				val prevKey = if (page == 1) null else page!! - 1
+				val nextKey = if (endOfPaginationReached) null else page!! + 1
 				val keys = responseData.listStory?.map {
 					RemoteKeys(id = it.id, prevKey = prevKey, nextKey = nextKey)
 				}

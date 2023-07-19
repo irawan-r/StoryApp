@@ -170,6 +170,7 @@ class MainRepository @Inject constructor(
 
 	@OptIn(ExperimentalPagingApi::class)
 	fun getPagingStories(
+		page: Int? = 1,
 		token: String,
 		location: Double
 	): Flow<PagingData<StoryItem>> {
@@ -178,7 +179,7 @@ class MainRepository @Inject constructor(
 			config = PagingConfig(
 				pageSize = 10
 			),
-			remoteMediator = StoryRemoteMediator(appDatabase, apiService, bearerToken, location),
+			remoteMediator = StoryRemoteMediator(appDatabase, apiService, bearerToken, location, page),
 			pagingSourceFactory = {
 				appDatabase.storyDao().getStoryList()
 			}

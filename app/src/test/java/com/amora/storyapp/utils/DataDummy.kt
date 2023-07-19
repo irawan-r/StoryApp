@@ -6,7 +6,8 @@ import com.amora.storyapp.data.remote.model.StoryRequest
 
 object DataDummy {
 
-	fun getToken() = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTBhQVh5WUw4dVdwTlVldHYiLCJpYXQiOjE2ODk0ODA2NDF9.pGcwlVYsQQ-SY6UfxGNcXxEE-NvRk0HyHu3QVbl-Ifk"
+	fun getToken() =
+		"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTBhQVh5WUw4dVdwTlVldHYiLCJpYXQiOjE2ODk0ODA2NDF9.pGcwlVYsQQ-SY6UfxGNcXxEE-NvRk0HyHu3QVbl-Ifk"
 
 	fun generateDataDummyStoriesEntity(): List<StoryItem> {
 		val newList = mutableListOf<StoryItem>()
@@ -23,6 +24,12 @@ object DataDummy {
 			)
 			newList.add(story)
 		}
+		return newList
+	}
+
+	fun doAddNewStory(): List<StoryItem> {
+		val newList = generateDataDummyStoriesEntity().toMutableList()
+		newList.add(0, StoryItem("", "", "", "ini test deskripsi", 71.01, "", 101.111))
 		return newList
 	}
 
