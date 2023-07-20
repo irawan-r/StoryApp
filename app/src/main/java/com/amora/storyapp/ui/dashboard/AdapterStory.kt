@@ -54,7 +54,7 @@ class AdapterStory(private val context: Context) :
 		private const val VIEW_TYPE_HEADER = 0
 		private const val VIEW_TYPE_ITEM = 1
 
-		private val differCallback = object : DiffUtil.ItemCallback<StoryItem>() {
+		val differCallback = object : DiffUtil.ItemCallback<StoryItem>() {
 			override fun areItemsTheSame(oldItem: StoryItem, newItem: StoryItem): Boolean {
 				return oldItem.id == newItem.id
 			}

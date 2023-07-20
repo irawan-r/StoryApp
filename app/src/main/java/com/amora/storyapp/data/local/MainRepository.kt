@@ -37,6 +37,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.net.URLDecoder
 import javax.inject.Inject
+import javax.inject.Singleton
 
 class MainRepository @Inject constructor(
 	private val sessionManager: SessionManager,
