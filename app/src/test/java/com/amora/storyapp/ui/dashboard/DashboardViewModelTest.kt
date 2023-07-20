@@ -92,6 +92,11 @@ class DashboardViewModelTest {
 		val actualPagingData = MutableStateFlow<State<PagingData<StoryItem>>>(State.Empty())
 
 		verify(repository).getPagingStories(null, token, 0.0)
+
+		// harus di test function yang ada di dashboard viewmodel
+		dashboardViewModel.dashboardState.collectLatest {
+			// here need to be tested after the action from repository dispatch, then every data come through from this flow need to be tested
+		}
 		repository.getPagingStories(null, token, 0.0).collectLatest { actualData ->
 			actualPagingData.update {
 				State.Loading()

@@ -18,6 +18,7 @@ import com.amora.storyapp.R
 import com.amora.storyapp.data.remote.model.LoginRequest
 import com.amora.storyapp.databinding.FragmentLoginBinding
 import com.amora.storyapp.ui.base.BaseFragment
+import com.amora.storyapp.utils.Constant
 import com.amora.storyapp.utils.State
 import com.amora.storyapp.utils.showSnackbarNotice
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,7 +37,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
 	override val inflateBinding: (LayoutInflater, ViewGroup?, Boolean) -> FragmentLoginBinding
 		get() = FragmentLoginBinding::inflate
 	override val viewModel: LoginViewModel by viewModels()
-	private val passwordDelayMillis = 1000
+	private val mainCoroutine = CoroutineScope(Dispatchers.Main)
 	private var passwordJob: Job? = null
 
 	override fun initView() {
@@ -74,12 +75,22 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
 				}
 
 				override fun afterTextChanged(s: Editable?) {
-					val password = s.toString()
-					if (etPassword.isFocused && password.isEmpty()) {
-						passwordJob?.cancel()
-						passwordJob = CoroutineScope(Dispatchers.Main).launch {
-							delay(passwordDelayMillis.toLong())
-							etPassword.error = "Please enter a password"
+					val password = s?.toString()
+					when {
+						password.isNullOrEmpty() -> {
+							passwordJob?.cancel()
+							passwordJob = mainCoroutine.launch {
+								delay(Constant.passwordDelayMillis.toLong())
+								etPassword.error = "Please enter a password"
+							}
+						}
+
+						password.length < Constant.lengthCharMin -> {
+							passwordJob?.cancel()
+							passwordJob = mainCoroutine.launch {
+								delay(Constant.passwordDelayMillis.toLong())
+								etPassword.error = "Password need to more than 8 character"
+							}
 						}
 					}
 				}
