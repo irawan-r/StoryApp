@@ -26,4 +26,8 @@ object DataDummy {
 		}
 		return newList
 	}
+
+	fun generateEmptyStoriesEntity(): List<StoryItem> {
+		return emptyList()
+	}
 }

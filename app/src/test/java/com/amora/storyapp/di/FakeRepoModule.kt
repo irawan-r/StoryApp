@@ -1,5 +1,6 @@
 package com.amora.storyapp.di
 
+import com.amora.storyapp.data.local.MainRepository
 import com.amora.storyapp.data.local.MainRepositoryImpl
 import com.amora.storyapp.data.local.SessionManager
 import com.amora.storyapp.data.persistence.AppDatabase
@@ -19,7 +20,7 @@ object MainRepositoryModule {
 		sessionManager: SessionManager,
 		apiService: ApiService,
 		appDatabase: AppDatabase
-	): MainRepositoryImpl {
+	): MainRepository {
 		return MainRepositoryImpl(sessionManager, apiService, appDatabase)
 	}
 }
