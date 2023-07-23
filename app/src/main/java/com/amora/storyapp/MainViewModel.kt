@@ -1,26 +1,19 @@
 package com.amora.storyapp
 
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.amora.storyapp.data.local.MainRepository
-import com.amora.storyapp.data.remote.model.User
-import com.bumptech.glide.Glide.init
+import com.amora.storyapp.data.local.MainRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-	private val repository: MainRepository
+	private val repository: MainRepositoryImpl
 ) : ViewModel() {
 
 	private val _navGraphDestination: MutableStateFlow<Int?> = MutableStateFlow(null)

@@ -5,7 +5,7 @@
 //import androidx.paging.PagingSource
 //import androidx.paging.PagingState
 //import androidx.paging.cachedIn
-//import com.amora.storyapp.data.local.MainRepository
+//import com.amora.storyapp.data.local.MainRepositoryImpl
 //import com.amora.storyapp.data.remote.model.StoryItem
 //import kotlinx.coroutines.flow.EmptyFlow.collect
 //import kotlinx.coroutines.flow.collect
@@ -16,7 +16,7 @@
 //import javax.inject.Inject
 //
 //class PagingData @Inject constructor(
-//	private val repository: MainRepository
+//	private val repository: MainRepositoryImpl
 //) : PagingSource<Int, StoryItem>() {
 //	override suspend fun load(params: LoadParams<Int>): LoadResult<Int, StoryItem> {
 //		return try {

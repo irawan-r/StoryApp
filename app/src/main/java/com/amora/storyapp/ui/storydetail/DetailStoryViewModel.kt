@@ -2,7 +2,7 @@ package com.amora.storyapp.ui.storydetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.amora.storyapp.data.local.MainRepository
+import com.amora.storyapp.data.local.MainRepositoryImpl
 import com.amora.storyapp.data.remote.model.StoryResponse
 import com.amora.storyapp.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailStoryViewModel @Inject constructor(
-	private val repository: MainRepository
+	private val repository: MainRepositoryImpl
 ) : ViewModel() {
 
 	private val _detailStoryState = MutableStateFlow<State<StoryResponse>>(State.Empty())
@@ -39,11 +39,11 @@ class DetailStoryViewModel @Inject constructor(
 						_detailStoryState.update {
 							State.Success(response)
 						}
-					}, onError = { error ->
+					}) { error ->
 						_detailStoryState.update {
 							State.Error(error)
 						}
-					}).onStart {
+					}.onStart {
 						_detailStoryState.update { State.Loading() }
 					}.onEmpty {
 						_detailStoryState.update { State.Empty() }

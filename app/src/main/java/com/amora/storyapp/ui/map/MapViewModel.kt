@@ -2,7 +2,7 @@ package com.amora.storyapp.ui.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.amora.storyapp.data.local.MainRepository
+import com.amora.storyapp.data.local.MainRepositoryImpl
 import com.amora.storyapp.data.remote.model.StoryLocResponse
 import com.amora.storyapp.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-	private val repository: MainRepository
+	private val repository: MainRepositoryImpl
 ) : ViewModel() {
 
 	private val _mapState = MutableStateFlow<State<StoryLocResponse>>(State.Empty())

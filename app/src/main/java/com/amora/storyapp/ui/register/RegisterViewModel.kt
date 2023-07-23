@@ -2,7 +2,7 @@ package com.amora.storyapp.ui.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.amora.storyapp.data.local.MainRepository
+import com.amora.storyapp.data.local.MainRepositoryImpl
 import com.amora.storyapp.data.remote.model.NormalResponse
 import com.amora.storyapp.data.remote.model.RegisterRequest
 import com.amora.storyapp.utils.State
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-	private val repository: MainRepository
+	private val repository: MainRepositoryImpl
 ) : ViewModel() {
 
 	private val _registerResult = MutableStateFlow<State<NormalResponse>>(State.Empty())

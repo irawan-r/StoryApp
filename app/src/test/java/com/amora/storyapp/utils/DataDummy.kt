@@ -12,7 +12,7 @@ object DataDummy {
 	fun generateDataDummyStoriesEntity(): List<StoryItem> {
 		val newList = mutableListOf<StoryItem>()
 
-		for (i in 0..10) {
+		for (i in 0..9) {
 			val story = StoryItem(
 				photoUrl = "https://story-api.dicoding.dev/images/stories/photos-1689467155925_rTC6gj8j.jpg",
 				createdAt = "2023-07-16T00:25:55.927Z",
@@ -25,20 +25,5 @@ object DataDummy {
 			newList.add(story)
 		}
 		return newList
-	}
-
-	fun doAddNewStory(): List<StoryItem> {
-		val newList = generateDataDummyStoriesEntity().toMutableList()
-		newList.add(0, StoryItem("", "", "", "ini test deskripsi", 71.01, "", 101.111))
-		return newList
-	}
-
-	fun generateStoryData(): StoryRequest {
-		return StoryRequest(
-			"ini test deskripsi",
-			"",
-			101.111,
-			71.01
-		)
 	}
 }

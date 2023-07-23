@@ -1,5 +1,6 @@
 package com.amora.storyapp.di
 
+import com.amora.storyapp.data.local.MainRepository
 import com.amora.storyapp.data.local.MainRepositoryImpl
 import com.amora.storyapp.data.local.SessionManager
 import com.amora.storyapp.data.persistence.AppDatabase
@@ -12,14 +13,20 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object MainRepositoryModule {
+object RepositoryModule {
+
 	@Provides
 	@Singleton
-	fun provideMainRepository(
+	fun provideRepository(
 		sessionManager: SessionManager,
 		apiService: ApiService,
 		appDatabase: AppDatabase
-	): MainRepositoryImpl {
-		return MainRepositoryImpl(sessionManager, apiService, appDatabase)
+	): MainRepository {
+		// Provide an instance of the RepositoryMainImpl
+		return MainRepositoryImpl(
+			sessionManager = sessionManager,
+			apiService = apiService,
+			appDatabase = appDatabase
+		)
 	}
 }

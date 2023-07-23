@@ -2,17 +2,14 @@ package com.amora.storyapp.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.amora.storyapp.data.local.MainRepository
+import com.amora.storyapp.data.local.MainRepositoryImpl
 import com.amora.storyapp.data.remote.model.LoginRequest
 import com.amora.storyapp.data.remote.model.LoginResponse
-import com.amora.storyapp.data.remote.model.User
 import com.amora.storyapp.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onEmpty
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -21,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-	private val repository: MainRepository
+	private val repository: MainRepositoryImpl
 ) : ViewModel() {
 
 	private val _loginResult = MutableStateFlow<State<LoginResponse?>>(State.Empty())
